@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Liste des Bacs</h2>
+<button class="btn btn-success w-10" data-bs-toggle="modal" data-bs-target="#createModal">➕ Ajouter</button>
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Image</th>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bac in bacs %}
+            <tr>
+                <td>
+                    {% if bac.image %}
+                        <img src="{{ bac.image.url }}" alt="{{ bac.nom }}" style="width: 100px; height: auto;">
+                    {% else %}
+                        <p class="text-muted">Aucune image</p>
+                    {% endif %}
+                </td>
+                <td>{{ bac.nom }}</td>
+                <td>{{ bac.description }}</td>
+                <td>
+                    <div class="d-flex gap-2">
+                      <!-- ➕ Bouton Ajouter -->
+
+
+<!-- ➕ Modal d'ajout -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'bac_create' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">Ajouter un Bac</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nom" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="nom" name="nom" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Image</label>
+                        <input type="file" class="form-control" id="image" name="image">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Créer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+                        <!-- ✏️ Bouton pour ouvrir le modal -->
+<button class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#editModal{{ bac.id }}">✏ Modifier</button>
+
+<!-- ✏️ Modal de modification -->
+<div class="modal fade" id="editModal{{ bac.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ bac.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'bac_update' bac.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel{{ bac.id }}">Modifier Bac : {{ bac.nom }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nom{{ bac.id }}" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="nom{{ bac.id }}" name="nom" value="{{ bac.nom }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description{{ bac.id }}" class="form-label">Description</label>
+                        <textarea class="form-control" id="description{{ bac.id }}" name="description" rows="3" required>{{ bac.description }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image{{ bac.id }}" class="form-label">Image</label>
+                        <input type="file" class="form-control" id="image{{ bac.id }}" name="image">
+                        {% if bac.image %}
+                            <small class="text-muted">Image actuelle : {{ bac.image.name }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Fin modal -->
+
+                        <!-- 🗑 Bouton qui déclenche le modal -->
+                        <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteModal{{ bac.id }}">🗑 Supprimer</button>
+                    </div>
+
+                    <!-- 🔴 Modal de confirmation de suppression -->
+                    <div class="modal fade" id="deleteModal{{ bac.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ bac.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post" action="{% url 'bac_delete' bac.id %}">
+                                    {% csrf_token %}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ bac.id }}">Confirmer la suppression</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Êtes-vous sûr de vouloir supprimer <strong>{{ bac.nom }}</strong> ?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Fin modal -->
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

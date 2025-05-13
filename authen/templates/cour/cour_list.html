@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}Liste des Cours{% endblock %}
+
+{% block content %}
+<div><h2 class="me-3">📚 Liste des Cours</h2></div>
+<div class="d-flex justify-content-start align-items-center mb-3">
+    
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal">➕ Ajouter</button>
+</div>
+
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Titre</th>
+            <th>Chapitre</th>
+            <th>Vidéo</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cour in cours %}
+        <tr>
+            <td>{{ cour.id }}</td>
+            <td>{{ cour.titre }}</td>
+            <td>{{ cour.chapitre.titre }}</td>
+            <td>
+                {% if cour.video %}
+                    <a href="{{ cour.video.url }}" target="_blank">🎥 Voir la vidéo</a>
+                {% else %}
+                    <span class="text-muted">Pas de vidéo</span>
+                {% endif %}
+            </td>
+            <td>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#editModal{{ cour.id }}">✏ Modifier</button>
+                    <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteModal{{ cour.id }}">🗑 Supprimer</button>
+                </div>
+            </td>
+        </tr>
+
+        <!-- Modal Modifier -->
+        <div class="modal fade" id="editModal{{ cour.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ cour.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="{% url 'cour_update' cour.id %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel{{ cour.id }}">Modifier le cours</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="text" name="titre" class="form-control mb-2" value="{{ cour.titre }}" required>
+                            <select name="chapitre" class="form-control mb-2" required>
+                                {% for chapitre in chapitres %}
+                                    <option value="{{ chapitre.id }}" {% if chapitre.id == cour.chapitre.id %}selected{% endif %}>{{ chapitre.titre }}</option>
+                                {% endfor %}
+                            </select>
+                            <label class="form-label">Vidéo (laisser vide pour conserver l'actuelle)</label>
+                            <input type="file" name="video" class="form-control">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-warning">Modifier</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Supprimer -->
+        <div class="modal fade" id="deleteModal{{ cour.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ cour.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="{% url 'cour_delete' cour.id %}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel{{ cour.id }}">Confirmer la suppression</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Êtes-vous sûr de vouloir supprimer le cours <strong>{{ cour.titre }}</strong> ?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Modal Ajouter un cours -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{% url 'cour_create' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">Ajouter un cours</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{ form_create.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Ajouter</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

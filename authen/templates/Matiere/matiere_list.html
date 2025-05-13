@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Liste des Matières</h2>
+
+    <!-- Bouton d'ajout -->
+    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addModal">➕ Ajouter une Matière</button>
+<table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <!-- <th>ID</th> -->
+                <th>Nom</th>
+                <th>Bac</th>
+                <th>Image</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for matiere in matieres %}
+            <tr>
+                <td>{{ matiere.id }}</td>
+                <td>{{ matiere.nom }}</td>
+                <td>{{ matiere.bac.nom }}</td>
+                <td>
+                    {% if matiere.image %}
+                        <img src="{{ matiere.image.url }}" alt="{{ matiere.nom }}" width="50" height="50" class="rounded">
+                    {% else %}
+                        <span class="text-muted">Aucune image</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal{{ matiere.id }}">✏ Modifier</button>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ matiere.id }}">🗑 Supprimer</button>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- Modal Modifier -->
+            <div class="modal fade" id="editModal{{ matiere.id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form method="POST" action="{% url 'matiere_update' matiere.id %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                                <h5 class="modal-title">Modifier Matière</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Nom</label>
+                                    <input type="text" name="nom" value="{{ matiere.nom }}" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Bac</label>
+                                    <select name="bac_id" class="form-select" required>
+                                        {% for bac in bacs %}
+                                            <option value="{{ bac.id }}" {% if bac.id == matiere.bac.id %}selected{% endif %}>{{ bac.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Image</label>
+                                    <input type="file" name="image" class="form-control">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Supprimer -->
+            <div class="modal fade" id="deleteModal{{ matiere.id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form method="POST" action="{% url 'matiere_delete' matiere.id %}">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                                <h5 class="modal-title">Supprimer Matière</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Voulez-vous vraiment supprimer la matière <strong>{{ matiere.nom }}</strong> ?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Ajouter -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{% url 'matiere_create' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter une Matière</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nom</label>
+                        <input type="text" name="nom" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bac</label>
+                        <select name="bac_id" class="form-select" required>
+                            {% for bac in bacs %}
+                                <option value="{{ bac.id }}">{{ bac.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Image</label>
+                        <input type="file" name="image" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

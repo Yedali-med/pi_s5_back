@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">📖 Liste des Chapitres</h2>
+<button class="btn btn-success w-10" data-bs-toggle="modal" data-bs-target="#createModal">➕ Ajouter</button>
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Titre</th>
+                <th>Matière</th>
+                <th>Nombre de Leçons</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for chapitre in chapitres %}
+            <tr>
+                <td>{{ chapitre.numero }}</td>
+                <td>{{ chapitre.titre }}</td>
+                <td>{{ chapitre.matiere.nom }}</td>
+                <td>{{ chapitre.nombre_de_lecons }}</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <!-- Button Modifier -->
+                        <button class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#editModal{{ chapitre.id }}">✏ Modifier</button>
+                        
+                        <!-- Button Supprimer -->
+                        <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteModal{{ chapitre.id }}">🗑 Supprimer</button>
+                    </div>
+                </td>
+            </tr>
+
+          <!-- Modal Modifier -->
+<div class="modal fade" id="editModal{{ chapitre.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ chapitre.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel{{ chapitre.id }}">Modifier le chapitre</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'chapitre_update' chapitre.id %}">
+                    {% csrf_token %}
+                    {{ form_update.as_p }}  <!-- Formulaire pour modifier un chapitre -->
+                    <button type="submit" class="btn btn-warning">Modifier</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+            <!-- Modal Suppression -->
+            <div class="modal fade" id="deleteModal{{ chapitre.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ chapitre.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel{{ chapitre.id }}">Confirmer la suppression</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Êtes-vous sûr de vouloir supprimer ce chapitre : <strong>{{ chapitre.titre }}</strong> ?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <!-- Formulaire de suppression -->
+                            <form method="POST" action="{% url 'chapitre_delete' chapitre.id %}">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Button Trigger Modal Ajouter -->
+    
+
+    <!-- Modal Ajouter un chapitre -->
+    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">Ajouter un chapitre</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{% url 'chapitre_create' %}">
+                        {% csrf_token %}
+                        {{ form_create.as_p }}  <!-- Formulaire pour ajouter un chapitre -->
+                        <button type="submit" class="btn btn-success">Ajouter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
