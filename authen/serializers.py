@@ -58,12 +58,7 @@ class CourSerializer(serializers.ModelSerializer):
 
 
 ###################
-from .models import UserProfile
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = ['username', 'telephone', 'profile_image']
 ################
 from rest_framework import serializers
 from .models import Commentaire, CommentaireReaction

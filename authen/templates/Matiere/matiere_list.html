@@ -9,11 +9,12 @@
 <table class="table table-bordered">
         <thead class="table-dark">
             <tr>
-                <!-- <th>ID</th> -->
+                 <th>ID</th> 
                 <th>Nom</th>
                 <th>Bac</th>
                 <th>Image</th>
-                <th>Actions</th>
+              <th class="text-center">Actions</th>
+
             </tr>
         </thead>
         <tbody>
@@ -30,10 +31,20 @@
                     {% endif %}
                 </td>
                 <td>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal{{ matiere.id }}">✏ Modifier</button>
-                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ matiere.id }}">🗑 Supprimer</button>
-                    </div>
+      <div class="row g-2">
+    <div class="col">
+        <button class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#editModal{{ matiere.id }}">
+            ✏ Modifier
+        </button>
+    </div>
+    <div class="col">
+        <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteModal{{ matiere.id }}">
+            🗑 Supprimer
+        </button>
+    </div>
+</div>
+
+
                 </td>
             </tr>
 

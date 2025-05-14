@@ -13,12 +13,13 @@ from .views import CoursListAPIView
 from .views import get_user_info
 from . import views
 
+
 # Créer les routers pour les ViewSets
 router = DefaultRouter()
 router.register(r'bacs', BacViewSet, basename='bac')  # URL pour le modèle Bac
 router.register(r'cours', CourViewSet, basename='cours')  # URL pour le modèle Cour
 from django.urls import path
-from .views import profile_view
+
 # Combiner toutes les URLs
 from .views import CommentaireViewSet
 
@@ -84,7 +85,7 @@ urlpatterns = [
     path('cours/<int:pk>/supprimer/', CourDeleteView.as_view(), name='cour_delete'),
     path('api/cours-chapitre/<int:chapitre_id>/', CoursListAPIView.as_view(), name='cours-list'),
     ###########
-    path('profile/', profile_view, name='profile'),  # ✅ Route API Profile
+    
     ############
     path('commentaires/', commentaire_list, name='commentaire-liste'),
     path('commentaires/<int:pk>/', commentaire_detail, name='commentaire-detail'),
@@ -92,5 +93,8 @@ urlpatterns = [
     path('commentaires/<int:pk>/dislike/', commentaire_dislike, name='commentaire-dislike'),
     path('commentaires/<int:pk>/remove_reaction/', commentaire_remove_reaction, name='commentaire-remove-reaction'),
     path('user_info/<int:user_id>/', get_user_info),
-
+     path('',views.login,name="login"),
+    path('signup-wb/', views.inscription, name='signup'),
+     path('home/', views.home, name='home'),
+     path('logout/', views.logout_view, name='logout'),
 ]

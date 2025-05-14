@@ -191,3 +191,10 @@ import os
 
 MEDIA_URL = '/media/'  # URL de base pour les fichiers médias
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Dossier où les fichiers seront stockés
+
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+LOGIN_REDIRECT_URL = 'login'

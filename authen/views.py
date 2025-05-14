@@ -382,24 +382,7 @@ def video_detail(request, video_id):
     video = get_object_or_404(Video, id=video_id)
     return render(request, 'video_detail.html', {'video': video})
 ##############
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from .models import UserProfile
-from .serializers import UserProfileSerializer
 
-@api_view(['POST'])
-def profile_view(request):
-    telephone = request.data.get('telephone')  # Récupérer le numéro envoyé par l'application Flutter
-    
-    if not telephone:
-        return Response({'error': 'Le numéro de téléphone est requis'}, status=400)
-
-    try:
-        user = UserProfile.objects.get(telephone=telephone)
-        serializer = UserProfileSerializer(user)
-        return Response(serializer.data, status=200)
-    except UserProfile.DoesNotExist:
-        return Response({'error': 'Utilisateur non trouvé'}, status=404)
 ##########
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
@@ -485,3 +468,58 @@ def get_user_info(request, user_id):
     except Authen.DoesNotExist:
         return Response({'error': 'Utilisateur non trouvé'}, status=status.HTTP_404_NOT_FOUND)
 ###########
+def login(request):
+    if request.method == 'POST':
+        login_value = request.POST.get('login')
+        mot_de_passe = request.POST.get('pwd')
+
+        try:
+            inscription = Inscription.objects.get(login=login_value)
+            if check_password(mot_de_passe, inscription.mot_de_passe):
+                return redirect('home')
+            else:
+                error_message = "Login or password is incorrect."
+                return render(request, 'login.html', {'error_message': error_message})
+
+        except Inscription.DoesNotExist:
+            error_message = "Login or password is incorrect."
+            return render(request, 'login.html', {'error_message': error_message})
+    return render(request, 'login.html')
+######
+from django.shortcuts import render, redirect
+from django.contrib.auth.hashers import make_password
+from .models import Inscription
+from django.contrib.auth.hashers import check_password
+
+
+def inscription(request):
+    if request.method == 'POST':
+        login = request.POST.get('login')
+        mot_de_passe = request.POST.get('pwd')
+        confPwd = request.POST.get('confPwd')
+
+        if mot_de_passe == confPwd:
+            hashed_password = make_password(mot_de_passe)
+            inscription = Inscription(login=login, mot_de_passe=hashed_password)
+            inscription.save()
+            return redirect('login')  # Redirige vers la page de connexion après l'inscription
+        else:
+            error_message = "Les mots de passe ne correspondent pas."
+            return render(request, 'signup.html', {'error_message': error_message})
+
+    return render(request, 'signup.html')
+from django.shortcuts import render
+
+def home(request):
+    bacs = Bac.objects.all()  # Récupérer tous les objets Bac
+    return render(request, 'bac/list.html', {'bacs': bacs})
+####
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+def logout_view(request):
+    """
+    Déconnecte l'utilisateur et le redirige vers la page de login.
+    """
+    logout(request)
+    return redirect('login')  # Assurez-vous que 'login' est le nom de l'URL de connexion
